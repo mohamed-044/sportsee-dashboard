@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
   e.preventDefault();
@@ -25,7 +28,7 @@ function Login() {
     }
 
     const loginData = await loginRes.json();
-    localStorage.setItem("token", loginData.token);
+    login(loginData.token);
 
     // Fetch user-info avec token
     const userRes = await fetch(`${API_URL}/api/user-info`, {
