@@ -3,6 +3,7 @@ import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useState } from "react";
 import { useEffect } from "react";
+import { fetchUserInfo } from "../services/authService";
 
 function Dashboard() {
 
@@ -12,23 +13,24 @@ function Dashboard() {
   if (!token) {
     return <Navigate to="/login" />;
   }
-    useEffect(() => {
+
+  useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/user-info", {
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
-        });
-        const data = await res.json();
+        const data = await fetchUserInfo(token);
         console.log("userData:", data);
         setUserData(data);
       } catch (error) {
         console.error(error);
       }
     };
+
     fetchUserData();
   }, [token]);
+
+  if (!userData) {
+    return <div>Chargement...</div>;
+  }
 
   const { profile, statistics } = userData;
 
@@ -37,9 +39,13 @@ function Dashboard() {
       <h1>Bonjour {profile.firstName}</h1>
 
       <img
-        src={profile.profilePicture}
+        src={profile.profilePicture || "https://via.placeholder.com/120"}
         alt="profile"
         width="120"
+        onError={(e) => {
+          e.currentTarget.onerror = null;
+          e.currentTarget.src = "https://via.placeholder.com/120";
+        }}
       />
 
       <h2>Statistiques</h2>
