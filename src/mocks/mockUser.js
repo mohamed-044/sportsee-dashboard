@@ -14,3 +14,20 @@ export const mockUser = {
     totalDuration: 14625,
   },
 };
+
+export const mockUser2 = {
+  profile: {
+    firstName: "Clara",
+    lastName: "Dupond",
+    createdAt: "2024-06-15",
+    age: 28,
+    weight: 75,
+    height: 178,
+    profilePicture: "/src/img/lucas.jpg",
+  },
+  statistics: {
+    totalDistance: "3120.8",
+    totalSessions: 421,
+    totalDuration: 18240,
+  },
+};

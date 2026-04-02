@@ -20,6 +20,11 @@ export async function fetchUserInfo(token) {
     throw new Error('Token manquant pour récupérer les données utilisateur');
   }
 
+  if (import.meta.env.VITE_USE_MOCK === 'true') {
+        const { mockUser } = await import('../mocks/mockUser.js');
+        return mockUser;
+      }
+
   try {
     const res = await fetch(`${SITE_URL}/api/user-info`, {
       headers: {
@@ -33,11 +38,6 @@ export async function fetchUserInfo(token) {
 
       if (res.status === 401 || res.status === 403) {
         throw new Error('Token invalide ou accès refusé. Veuillez vous reconnecter.');
-      }
-
-      if (import.meta.env.VITE_USE_MOCK === 'true') {
-        const { mockUser } = await import('../mocks/mockUser.js');
-        return mockUser;
       }
 
       throw new Error(err?.message || `Erreur user-info (${res.status})`);

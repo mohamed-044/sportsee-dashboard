@@ -1,56 +1,60 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { loginUser, fetchUserInfo } from "../services/authService";
+import logo from "../img/logo.png";
+import "../style/Login.css";
+import LoginForm from "../components/LoginForm";
 
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
 
     try {
       const loginData = await loginUser(username, password);
       login(loginData.token);
 
-      const userData = await fetchUserInfo(loginData.token);
-      console.log("userData:", userData);
+      await fetchUserInfo(loginData.token);
 
-      navigate("/dashboard");
+      navigate("/profile");
     } catch (err) {
-      console.error(err);
-      setError(err.message);
+      setError(err.message || "Erreur de connexion");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div>
-      <h2>Connexion</h2>
-
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Identifiant"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+    <div className="login-page">
+    
+      <div className="login-left">
+        <img src={logo} alt="SPORTSEE" className="logo" />
+        <div className="login-container">
+         <LoginForm
+          username={username}
+          password={password}
+          setUsername={setUsername}
+          setPassword={setPassword}
+          handleSubmit={handleSubmit}
+          loading={loading}
+          error={error}
         />
+      </div>
+        </div>
+        
 
-        <input
-          type="password"
-          placeholder="Mot de passe"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+      <div className="login-right"></div>
 
-        <button type="submit">Se connecter</button>
-      </form>
-
-      {error && <p>{error}</p>}
     </div>
   );
 }

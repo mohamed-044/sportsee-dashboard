@@ -1,9 +1,17 @@
 import { Navigate } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { useState } from "react";
-import { useEffect } from "react";
 import { fetchUserInfo } from "../services/authService";
+import "../style/Dashboard.css";
+import Header from "../components/Header";
+import UserSummary from "../components/UserSummary";
+import ChartCard from "../components/ChartCard";
+import WeekCard from "../components/WeekCard";
+import SmallStatCard from "../components/SmallStatCard";
+import Footer from "../components/Footer";
+import DistanceChart from "../components/DistanceChart";
+import BpmChart from "../components/BpmChart";
+import DonutChart from "../components/DonutChart";
 
 function Dashboard() {
 
@@ -35,27 +43,53 @@ function Dashboard() {
   const { profile, statistics } = userData;
 
   return (
-    <div>
-      <h1>Bonjour {profile.firstName}</h1>
+    <div className="dashboard">
 
-      <img
-        src={profile.profilePicture || "https://via.placeholder.com/120"}
-        alt="profile"
-        width="120"
-        onError={(e) => {
-          e.currentTarget.onerror = null;
-          e.currentTarget.src = "https://via.placeholder.com/120";
-        }}
-      />
+      <Header />
 
-      <h2>Statistiques</h2>
+      <main className="main">
 
-      <p>Distance totale : {statistics.totalDistance} km</p>
-      <p>Sessions : {statistics.totalSessions}</p>
-      <p>Durée totale : {statistics.totalDuration} min</p>
+        <UserSummary profile={profile} statistics={statistics} />
+
+        <section className="performance">
+          <h3>Vos dernières performances</h3>
+
+          <div className="charts">
+            <ChartCard>Graphique 1</ChartCard>
+            <ChartCard>Graphique 2</ChartCard>
+          </div>
+        </section>
+
+        <section className="week">
+          <h3>Cette semaine</h3>
+
+          <div className="week-content">
+
+            <div className="week-left">
+              <WeekCard sessions={statistics.totalSessions} />
+            </div>
+
+            <div className="week-right">
+              <SmallStatCard
+                label="Durée d'activité"
+                value={`${statistics.totalDuration} minutes`}
+              />
+
+              <SmallStatCard
+                label="Distance"
+                value={`${statistics.totalDistance} km`}
+              />
+            </div>
+
+          </div>
+        </section>
+
+      </main>
+
+      <Footer />
 
     </div>
-  );
+);
 }
 
 export default Dashboard;
