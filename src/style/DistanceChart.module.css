@@ -1,0 +1,16 @@
+.chartContainer {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  color: #2d3eff;
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+
+.bar {
+  fill: #c7ccff;
+}

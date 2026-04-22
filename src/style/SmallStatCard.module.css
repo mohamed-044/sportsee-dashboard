@@ -1,0 +1,21 @@
+.smallCard {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  width: 572px;
+  height: 103px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.smallCard p {
+  margin: 0;
+  font-size: 12px;
+  color: #777;
+}
+
+.smallCard h4 {
+  margin-top: 8px;
+  color: #2d3eff;
+}

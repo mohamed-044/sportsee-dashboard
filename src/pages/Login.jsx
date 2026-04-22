@@ -38,7 +38,7 @@ function Login() {
     <div className="login-page">
     
       <div className="login-left">
-        <img src={logo} alt="SPORTSEE" className="logo" />
+        <a href="/"><img src={logo} alt="SPORTSEE" className="logo" /></a>
         <div className="login-container">
          <LoginForm
           username={username}

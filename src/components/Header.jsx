@@ -1,13 +1,14 @@
 import logo from "../img/logo.png";
+import "../style/Header.css";
 
 function Header() {
   return (
     <header className="header">
-      <img src={logo} alt="logo" className="logo" />
+      <a href="/"><img src={logo} alt="SPORTSEE" className="logo" /></a>
 
       <nav>
-        <span>Dashboard</span>
-        <span>Mon profil</span>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/profile">Mon profil</a>
         <span className="logout">Se déconnecter</span>
       </nav>
     </header>

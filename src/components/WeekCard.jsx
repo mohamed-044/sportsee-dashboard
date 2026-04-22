@@ -1,3 +1,6 @@
+import "../style/ChartCard.css";
+import DonutChart from "./DonutChart";
+
 function WeekCard({ sessions }) {
   return (
     <div className="card">
@@ -5,7 +8,7 @@ function WeekCard({ sessions }) {
       <p>Courses réalisées</p>
 
       <div className="chart">
-        Donut
+        <DonutChart sessions={sessions} />
       </div>
     </div>
   );

@@ -1,0 +1,33 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 20px 40px;
+
+}
+
+.logo {
+  height: 30px;
+}
+
+.header nav {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+    background-color: white;
+}
+
+.header a {
+  text-decoration: none; 
+  color: black;     
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+
+.logout {
+  color: #2d3eff;
+  cursor: pointer;
+  font-weight: 500;
+}

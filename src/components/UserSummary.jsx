@@ -1,7 +1,9 @@
+import styles from "../style/UserSummary.module.css";
+
 function UserSummary({ profile, statistics }) {
   return (
-    <div className="user-card">
-      <div className="user-left">
+    <div className={styles.userCard}>
+      <div className={styles.userLeft}>
         <img
           src={profile.profilePicture || "https://via.placeholder.com/120"}
           alt="profile"
@@ -20,9 +22,9 @@ function UserSummary({ profile, statistics }) {
         </div>
       </div>
 
-      <div className="user-right">
+      <div className={styles.userRight}>
         <p>Distance totale parcourue</p>
-        <div className="blue-box">
+        <div className={styles.blueBox}>
           {statistics.totalDistance} km
         </div>
       </div>

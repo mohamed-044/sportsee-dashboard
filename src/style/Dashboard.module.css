@@ -16,7 +16,7 @@
   height: 28px;
 }
 
-.header nav {
+.headerNav {
   display: flex;
   gap: 20px;
   background: #eaeef7;
@@ -40,7 +40,7 @@
   width: 100%;
 }
 
-.user-card {
+.userCard {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -49,41 +49,41 @@
   padding: 25px;
 }
 
-.user-left {
+.userLeft {
   display: flex;
   align-items: center;
   gap: 20px;
 }
 
-.user-left img {
+.userLeft img {
   width: 70px;
   height: 70px;
   border-radius: 10px;
   object-fit: cover;
 }
 
-.user-left h2 {
+.userLeft h2 {
   margin: 0;
   font-size: 18px;
 }
 
-.user-left p {
+.userLeft p {
   margin: 0;
   font-size: 12px;
   color: #777;
 }
 
-.user-right {
+.userRight {
   text-align: right;
 }
 
-.user-right p {
+.userRight p {
   font-size: 12px;
   color: #777;
   margin-bottom: 8px;
 }
 
-.blue-box {
+.blueBox {
   background: #2d3eff;
   color: white;
   padding: 12px 20px;
@@ -113,34 +113,34 @@
   gap: 20px;
 }
 
-.distance-card {
+.distanceCard {
   width: 445px;
   height: 484px;
   grid-area: distance;
 }
 
-.bpm-card {
+.bpmCard {
   width: 583px;
   height: 484px;
   grid-area: bpm;
 }
 
-.donut-card {
+.donutCard {
   width: 450px;
   height: 342px;
   grid-area: donut;
 }
 
-.chart-card {
+.chartCard {
   width: 572px;
   height: 342px;
   grid-area: stats;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 20px;
+  gap: 14px;
+  padding: 0;
+  justify-content: flex-start;
 }
-
 
 .week {
   margin-top: 40px;
@@ -151,16 +151,16 @@
   margin-bottom: 20px;
 }
 
-.week-content {
+.weekContent {
   display: flex;
   gap: 20px;
 }
 
-.week-left {
+.weekLeft {
   flex: 1;
 }
 
-.week-right {
+.weekRight {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -177,19 +177,19 @@
   margin: 5px 0;
 }
 
-.small-card {
+.smallCard {
   background: white;
   padding: 20px;
   border-radius: 12px;
 }
 
-.small-card p {
+.smallCard p {
   margin: 0;
   font-size: 12px;
   color: #777;
 }
 
-.small-card h4 {
+.smallCard h4 {
   margin-top: 8px;
   color: #2d3eff;
 }
@@ -201,4 +201,22 @@
   font-size: 12px;
   color: #777;
   border-top: 1px solid #eee;
+}
+
+.smallStats {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.chartHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.chartHeader h4 {
+  margin: 0;
+  font-size: 14px;
 }

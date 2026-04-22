@@ -1,0 +1,55 @@
+.donut-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.donut-header h3 {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.highlight {
+  color: #2d3eff;
+  font-weight: bold;
+}
+
+.donut-header p {
+  color: #777;
+  font-size: 14px;
+}
+
+.donut-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 0 10px;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #555;
+}
+
+.left,
+.right {
+  position: static;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.blue {
+  background-color: #2d3eff;
+}
+
+.light {
+  background-color: #a0a6d6;
+}
