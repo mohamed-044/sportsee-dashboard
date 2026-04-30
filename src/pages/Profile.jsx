@@ -11,6 +11,7 @@ import Footer from "../components/Footer";
 function Profile() {
   const token = localStorage.getItem("token");
   const [userData, setUserData] = useState(null);
+  const [sessions, setSessions] = useState([]);
 
   if (!token) {
     return <Navigate to="/login" />;
@@ -20,7 +21,6 @@ function Profile() {
     const fetchUserData = async () => {
       try {
         const data = await fetchUserInfo(token);
-        console.log("userData:", data);
         setUserData(data);
       } catch (error) {
         console.error(error);
@@ -30,11 +30,58 @@ function Profile() {
     fetchUserData();
   }, [token]);
 
+  useEffect(() => {
+    if (!token) return;
+
+    const fetchSessions = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:8000/api/user-activity?startWeek=2025-01-01&endWeek=2025-12-31`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await res.json();
+
+        if (!Array.isArray(data)) {
+          setSessions([]);
+          return;
+        }
+
+        const formatted = data.map((session) => ({
+          date: session.date,
+          calories: session.caloriesBurned ?? 0,
+        }));
+
+        setSessions(formatted);
+      } catch (err) {
+        console.error(err);
+        setSessions([]);
+      }
+    };
+
+    fetchSessions();
+  }, [token]);
+
   if (!userData) {
     return <div>Chargement...</div>;
   }
 
   const { profile, statistics } = userData;
+
+  const totalCalories = sessions.reduce(
+    (sum, s) => sum + s.calories,
+    0
+  );
+
+  const uniqueDays = new Set(
+    sessions.map((s) => new Date(s.date).toDateString())
+  );
+
+  const restDays = 365 - uniqueDays.size;
 
   return (
     <div className="profile-page">
@@ -55,19 +102,29 @@ function Profile() {
 
           <div className="stats-grid">
             <StatCard
-              label="Distance totale"
-              value={statistics.totalDistance}
-              unit="km"
-            />
-
-            <StatCard
-              label="Durée totale"
+              label="Temps total couru"
               value={statistics.totalDuration}
               unit="min"
             />
 
             <StatCard
-              label="Sessions"
+              label="Calories brûlées"
+              value={`${totalCalories} kcal`}
+            />
+
+            <StatCard
+              label="Distance totale parcourue"
+              value={statistics.totalDistance}
+              unit="km"
+            />
+
+            <StatCard
+              label="Jours de repos"
+              value={`${restDays} jours`}
+            />
+
+            <StatCard
+              label="Nombre de sessions"
               value={statistics.totalSessions}
             />
           </div>

@@ -17,38 +17,30 @@ export async function loginUser(username, password) {
 
 export async function fetchUserInfo(token) {
   if (!token) {
-    throw new Error('Token manquant pour récupérer les données utilisateur');
+    throw new Error("Token manquant");
   }
-
-  if (import.meta.env.VITE_USE_MOCK === 'true') {
-        const { mockUser } = await import('../mocks/mockUser.js');
-        return mockUser;
-      }
 
   try {
     const res = await fetch(`${SITE_URL}/api/user-info`, {
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
     });
 
     if (!res.ok) {
-      const err = await res.json().catch(() => null);
-
-      if (res.status === 401 || res.status === 403) {
-        throw new Error('Token invalide ou accès refusé. Veuillez vous reconnecter.');
-      }
-
-      throw new Error(err?.message || `Erreur user-info (${res.status})`);
+      throw new Error(`Backend error (${res.status})`);
     }
 
-    return res.json();
-  } catch (fetchError) {
-    if (import.meta.env.VITE_USE_MOCK === 'true') {
-      const { mockUser } = await import('../mocks/mockUser.js');
+    const data = await res.json();
+    return data; 
+  } catch (error) {
+    console.warn("Backend failed, fallback to mock:", error);
+
+    if (import.meta.env.VITE_USE_MOCK === "true") {
+      const { mockUser } = await import("../mocks/mockUser.js");
       return mockUser;
     }
-    throw fetchError;
+
+    throw error;
   }
 }

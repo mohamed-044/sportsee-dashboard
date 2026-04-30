@@ -5,7 +5,7 @@ function WeekSelector({ startDate, endDate, onPrev, onNext }) {
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("fr-FR", {
       day: "numeric",
-      month: "short"
+      month: "short",
     });
   };
 
