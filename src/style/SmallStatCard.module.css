@@ -6,16 +6,37 @@
   height: 103px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
 }
 
 .smallCard p {
   margin: 0;
-  font-size: 12px;
+  font-size: 14px;
   color: #777;
 }
 
-.smallCard h4 {
+h4 {
   margin-top: 8px;
-  color: #2d3eff;
+}
+
+.minutes {
+  color: #0B23F4;
+  font-size: 22px;
+}
+
+.distance {
+  color: #F4320B;
+  font-size: 22px;
+}
+
+.unit-minutes {
+  margin-left: 4px;
+  color: #B6BDFC; 
+  font-size: 16px;
+}
+
+.unit-distance {
+  margin-left: 4px;
+  color: #FCC1B6; 
+  font-size: 16px;
 }

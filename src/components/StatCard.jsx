@@ -3,7 +3,7 @@ function StatCard({ label, value, unit }) {
     <div className="stat-card">
       <p>{label}</p>
       <h3>
-        {value} {unit}
+        {value} {unit && <span className="unit">{unit}</span>}
       </h3>
     </div>
   );

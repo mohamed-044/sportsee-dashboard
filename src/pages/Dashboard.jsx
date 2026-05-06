@@ -1,205 +1,232 @@
 import { Navigate } from "react-router-dom";
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useMemo } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { fetchUserInfo } from "../services/authService";
+
 import styles from "../style/Dashboard.module.css";
+
 import Header from "../components/Header";
 import UserSummary from "../components/UserSummary";
 import ChartCard from "../components/ChartCard";
 import SmallStatCard from "../components/SmallStatCard";
 import Footer from "../components/Footer";
+
 import DistanceChart from "../components/DistanceChart";
 import BpmChart from "../components/BpmChart";
 import DonutChart from "../components/DonutChart";
 import WeekSelector from "../components/WeekSelector";
 
+const getCurrentWeek = () => {
+  const today = new Date();
+  const day = today.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+
+  const monday = new Date(today);
+  monday.setDate(today.getDate() + diff);
+  monday.setHours(0, 0, 0, 0);
+
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  sunday.setHours(23, 59, 59, 999);
+
+  return { monday, sunday };
+};
+
 function Dashboard() {
   const { token } = useContext(AuthContext);
 
+  const currentWeek = useMemo(() => getCurrentWeek(), []);
+
   const [userData, setUserData] = useState(null);
 
-  const [startDate, setStartDate] = useState(new Date("2025-01-01"));
-  const [endDate, setEndDate] = useState(new Date("2025-01-07"));
+  const [startDate, setStartDate] = useState(currentWeek.monday);
+  const [endDate, setEndDate] = useState(currentWeek.sunday);
+
+  const [distanceStartDate, setDistanceStartDate] = useState(() => {
+    const d = new Date(currentWeek.monday);
+    d.setDate(d.getDate() - 21);
+    return d;
+  });
+
+  const [distanceEndDate, setDistanceEndDate] = useState(currentWeek.sunday);
 
   const [sessions, setSessions] = useState([]);
-
-  const [distanceStartDate, setDistanceStartDate] = useState(new Date("2025-01-01"));
-  const [distanceEndDate, setDistanceEndDate] = useState(new Date("2025-01-28"));
-
   const [distanceSessions, setDistanceSessions] = useState([]);
 
   useEffect(() => {
     if (!token) return;
 
     const fetchUserData = async () => {
-      try {
-        const data = await fetchUserInfo(token);
-        setUserData(data);
-      } catch (error) {
-        console.error(error);
-      }
+      const data = await fetchUserInfo(token);
+      setUserData(data);
     };
 
     fetchUserData();
   }, [token]);
 
   useEffect(() => {
-    if (!token) return;
+    if (!token || !startDate || !endDate) return;
 
     const fetchSessions = async () => {
-      try {
-        const res = await fetch(
-          `http://localhost:8000/api/user-activity?startWeek=${startDate.toISOString()}&endWeek=${endDate.toISOString()}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+      const url = new URL("http://localhost:8000/api/user-activity");
 
-        const data = await res.json();
+      url.searchParams.set("startWeek", startDate.toISOString().split("T")[0]);
+      url.searchParams.set("endWeek", endDate.toISOString().split("T")[0]);
 
-        if (!Array.isArray(data)) {
-          setSessions([]);
-          return;
-        }
+      const res = await fetch(url.toString(), {
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
-        const formattedSessions = data.map((session) => ({
-          date: session.date,
-          distance: session.distance,
-          bpm: session.heartRate?.average ?? 0,
-          duration: session.duration,
-          calories: session.caloriesBurned ?? 0
-        }));
+      const data = await res.json();
 
-      const totalCalories = sessions.reduce(
-        (sum, s) => sum + (s.calories || 0),
-        0
-      );
-
-      const restDays = 7 - sessions.length;
-
-        setSessions(formattedSessions);
-      } catch (err) {
-        console.error(err);
+      if (!Array.isArray(data)) {
         setSessions([]);
+        return;
       }
+
+      setSessions(
+        data.map((s) => ({
+          date: s.date,
+          distance: s.distance || 0,
+          bpm: s.heartRate?.average || 0,
+          duration: s.duration || 0
+        }))
+      );
     };
 
     fetchSessions();
   }, [startDate, endDate, token]);
 
   useEffect(() => {
-    if (!token) return;
+    if (!token || !distanceStartDate || !distanceEndDate) return;
 
-    const fetchDistanceSessions = async () => {
-      try {
-        const res = await fetch(
-          `http://localhost:8000/api/user-activity?startWeek=${distanceStartDate.toISOString()}&endWeek=${distanceEndDate.toISOString()}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+    const fetchDistance = async () => {
+      const url = new URL("http://localhost:8000/api/user-activity");
 
-        const data = await res.json();
+      url.searchParams.set(
+        "startWeek",
+        distanceStartDate.toISOString().split("T")[0]
+      );
+      url.searchParams.set(
+        "endWeek",
+        distanceEndDate.toISOString().split("T")[0]
+      );
 
-        if (!Array.isArray(data)) {
-          setDistanceSessions([]);
-          return;
-        }
+      const res = await fetch(url.toString(), {
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
-        const formattedSessions = data.map((session) => ({
-          date: session.date,
-          distance: session.distance,
-          bpm: session.heartRate?.average ?? 0,
-          duration: session.duration,
-        }));
+      const data = await res.json();
 
-        setDistanceSessions(formattedSessions);
-      } catch (err) {
-        console.error(err);
+      if (!Array.isArray(data)) {
         setDistanceSessions([]);
+        return;
       }
+
+      setDistanceSessions(
+        data.map((s) => ({
+          date: s.date,
+          distance: s.distance || 0,
+          duration: s.duration || 0
+        }))
+      );
     };
 
-    fetchDistanceSessions();
+    fetchDistance();
   }, [distanceStartDate, distanceEndDate, token]);
 
-  const changeWeek = (direction) => {
-    const newStart = new Date(startDate);
-    const newEnd = new Date(endDate);
+  const changeWeek = (dir) => {
+    setStartDate((p) => {
+      const d = new Date(p);
+      d.setDate(d.getDate() + dir * 7);
+      return d;
+    });
 
-    newStart.setDate(newStart.getDate() + direction * 7);
-    newEnd.setDate(newEnd.getDate() + direction * 7);
-
-    setStartDate(newStart);
-    setEndDate(newEnd);
+    setEndDate((p) => {
+      const d = new Date(p);
+      d.setDate(d.getDate() + dir * 7);
+      return d;
+    });
   };
 
-  const changeDistanceWeek = (direction) => {
-    const newStart = new Date(distanceStartDate);
-    const newEnd = new Date(distanceEndDate);
+  const changeDistanceWeek = (dir) => {
+    setDistanceStartDate((p) => {
+      const d = new Date(p);
+      d.setDate(d.getDate() + dir * 7);
+      return d;
+    });
 
-    newStart.setDate(newStart.getDate() + direction * 28);
-    newEnd.setDate(newEnd.getDate() + direction * 28);
-
-    setDistanceStartDate(newStart);
-    setDistanceEndDate(newEnd);
+    setDistanceEndDate((p) => {
+      const d = new Date(p);
+      d.setDate(d.getDate() + dir * 7);
+      return d;
+    });
   };
 
-  const filteredSessions = sessions.filter((session) => {
-    const sessionDate = new Date(session.date);
-    return sessionDate >= startDate && sessionDate <= endDate;
+  const filteredSessions = sessions.filter((s) => {
+    const d = new Date(s.date);
+    return d >= startDate && d <= endDate;
   });
 
-  const groupedDistanceSessions = Array.from({ length: 4 }, (_, i) => {
+  const currentWeekSessions = sessions.filter((s) => {
+    const d = new Date(s.date);
+    return d >= currentWeek.monday && d <= currentWeek.sunday;
+  });
+
+  const groupedDistanceSessions = [...Array(4)].map((_, i) => {
     const weekStart = new Date(distanceStartDate);
     weekStart.setDate(weekStart.getDate() + i * 7);
 
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekEnd.getDate() + 6);
 
-    const weekSessions = distanceSessions.filter((session) => {
-      const sessionDate = new Date(session.date);
-      return sessionDate >= weekStart && sessionDate <= weekEnd;
+    const weekSessions = distanceSessions.filter((s) => {
+      const d = new Date(s.date);
+      return d >= weekStart && d <= weekEnd;
     });
-
-    const totalDistance = weekSessions.reduce((sum, s) => sum + s.distance, 0);
-    const totalDuration = weekSessions.reduce((sum, s) => sum + s.duration, 0);
 
     return {
       week: `S${i + 1}`,
-      distance: totalDistance,
-      duration: totalDuration,
+      distance: weekSessions.reduce((a, b) => a + b.distance, 0),
+      duration: weekSessions.reduce((a, b) => a + b.duration, 0)
     };
   });
 
-  const bpmSessions = Array.from({ length: 7 }, (_, i) => {
-    const dayDate = new Date(startDate);
-    dayDate.setDate(dayDate.getDate() + i);
+  const bpmSessions = [...Array(7)].map((_, i) => {
+    const day = new Date(startDate);
+    day.setDate(day.getDate() + i);
 
-    const sessionForDay = filteredSessions.find((session) => {
-      const sessionDate = new Date(session.date);
-      return sessionDate.toDateString() === dayDate.toDateString();
+    const session = filteredSessions.find((s) => {
+      const d = new Date(s.date);
+      return d.toDateString() === day.toDateString();
     });
 
     return {
-      date: dayDate.toISOString().split("T")[0],
-      bpm: sessionForDay ? sessionForDay.bpm : 0,
+      date: day.toISOString().split("T")[0],
+      bpm: session?.bpm || 0
     };
   });
 
-  if (!token) {
-    return <Navigate to="/login" />;
-  }
+  const formatDate = (d) =>
+    new Date(d).toLocaleDateString("fr-FR");
 
-  if (!userData) {
-    return <div>Chargement...</div>;
-  }
+  if (!token) return <Navigate to="/login" />;
+  if (!userData) return <div>Chargement...</div>;
 
   const { profile, statistics } = userData;
+
+  // Calculate total duration and distance for the current week only
+  const fixedWeekSessions = currentWeekSessions;
+
+  const fixedTotalDuration = fixedWeekSessions.reduce(
+    (a, b) => a + b.duration,
+    0
+  );
+
+  const fixedTotalDistance = fixedWeekSessions.reduce(
+    (a, b) => a + b.distance,
+    0
+  );
 
   return (
     <div className={styles.dashboard}>
@@ -212,42 +239,56 @@ function Dashboard() {
           <h3>Vos dernières performances</h3>
 
           <div className={styles.charts}>
-            <ChartCard className={styles.distanceCard}>
-              <WeekSelector
-                startDate={distanceStartDate}
-                endDate={distanceEndDate}
-                onPrev={() => changeDistanceWeek(-1)}
-                onNext={() => changeDistanceWeek(1)}
-              />
-              <DistanceChart data={groupedDistanceSessions} />
+            <ChartCard>
+              <DistanceChart data={groupedDistanceSessions}>
+                <WeekSelector
+                  startDate={distanceStartDate}
+                  endDate={distanceEndDate}
+                  onPrev={() => changeDistanceWeek(-1)}
+                  onNext={() => changeDistanceWeek(1)}
+                />
+              </DistanceChart>
             </ChartCard>
 
-            <ChartCard className={styles.bpmCard}>
-              <WeekSelector
-                startDate={startDate}
-                endDate={endDate}
-                onPrev={() => changeWeek(-1)}
-                onNext={() => changeWeek(1)}
-              />
-              <BpmChart data={bpmSessions} />
+            <ChartCard>
+              <BpmChart data={bpmSessions}>
+                <WeekSelector
+                  startDate={startDate}
+                  endDate={endDate}
+                  onPrev={() => changeWeek(-1)}
+                  onNext={() => changeWeek(1)}
+                />
+              </BpmChart>
             </ChartCard>
+          </div>
 
-            <ChartCard className={styles.donutCard}>
+          <div>
+            <h3>Cette semaine</h3>
+            <p>
+              Du {formatDate(startDate)} au {formatDate(endDate)}
+            </p>
+          </div>
+
+          <div className={styles.bottomSection}>
+            <ChartCard>
               <DonutChart sessions={sessions.length} total={6} />
             </ChartCard>
 
             <div className={styles.smallStats}>
               <SmallStatCard
                 label="Durée d'activité"
-                value={`${groupedDistanceSessions.reduce((sum, s) => sum + s.duration, 0)} minutes`}
+                type="minutes"
+                value={{ number: fixedTotalDuration, unit: " min" }}
               />
+
               <SmallStatCard
                 label="Distance"
-                value={`${groupedDistanceSessions.reduce((sum, s) => sum + s.distance, 0).toFixed(1)} km`}
+                type="distance"
+                value={{
+                  number: fixedTotalDistance.toFixed(1),
+                  unit: " km"
+                }}
               />
-
-
-
             </div>
           </div>
         </section>

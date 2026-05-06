@@ -1,0 +1,31 @@
+.footer {
+  width: 100%;
+  background: white;
+}
+
+.footer-content {
+  max-width: 1440px;
+  max-height: 40px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-content p {
+  margin: 0;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.footer-links span {
+  cursor: pointer;
+}
+
+.footer-logo {
+  height: 20px;
+}

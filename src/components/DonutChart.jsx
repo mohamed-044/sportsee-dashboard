@@ -17,7 +17,7 @@ function DonutChart({ sessions, total = 6 }) {
 
       <div className={styles.header}>
         <h3>
-          <span className={styles.highlight}>x{sessions}</span> sur objectif de {total}
+          <span className={styles.highlight}>x{sessions}</span> <span className={styles.total}>sur objectif de </span> <span className={styles.total}>{total}</span>
         </h3>
         <p>Courses hebdomadaire réalisées</p>
       </div>
