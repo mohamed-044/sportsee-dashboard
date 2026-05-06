@@ -16,13 +16,30 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
+function PublicRoute({ children }) {
+  const { token } = useContext(AuthContext);
+
+  if (token) {
+    return <Navigate to="/profile" replace />;
+  }
+
+  return children;
+}
+
 function Router() {
   return (
     <BrowserRouter>
       <Routes>
 
-        <Route path="/" element={<Login />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
 
         <Route
           path="/dashboard"
