@@ -53,12 +53,20 @@ function Dashboard() {
   const [sessions, setSessions] = useState([]);
   const [distanceSessions, setDistanceSessions] = useState([]);
 
+  const { logout } = useContext(AuthContext);
+  
   useEffect(() => {
     if (!token) return;
 
     const fetchUserData = async () => {
-      const data = await fetchUserInfo(token);
-      setUserData(data);
+      try {
+        const data = await fetchUserInfo(token);
+        setUserData(data);
+      } catch (error) {
+        logout();
+        console.error("Erreur lors de la récupération des données utilisateur :", error);
+        return <Navigate to="/login" replace />;
+      }
     };
 
     fetchUserData();
